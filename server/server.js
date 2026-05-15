@@ -23,7 +23,7 @@ app.use("/api/auth", authRoutes);
 
 // Test route
 app.get("/", (req, res) => {
-  res.send("API is running...");
+  res.send("Hi Satheesan from the server..");
 });
 
 // Global Error Handler
