@@ -3,20 +3,20 @@ const mongoose = require("mongoose");
 const jobRequestSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
-  category: { type: String },
-  location: { type: String },
-  contactName: { type: String },
+  category: { type: String, required: true },
+  location: { type: String, required: true },
+  contactName: { type: String, required: true },
   contactEmail: {
-    type: String,
+    type: String, required: true, unique: true,
     match: [/^\S+@\S+\.\S+$/, "Please enter a valid email"]
   },
   status: {
-    type: String,
+    type: String, required: true,
     enum: ["Open", "In Progress", "Closed"],
     default: "Open"
   },
   createdAt: {
-    type: Date,
+    type: Date, required: true,
     default: Date.now
   }
 });
