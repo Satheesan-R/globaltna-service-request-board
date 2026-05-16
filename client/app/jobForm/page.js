@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import './formpage.css';
+import { apiUrl } from '../../lib/api';
 
 const SubmitRequest = () => {
   const router = useRouter();
@@ -79,7 +80,7 @@ const SubmitRequest = () => {
     
     if (validateForm()) {
       try {
-        const response = await fetch('http://localhost:5000/api/jobs', {
+        const response = await fetch(apiUrl('/api/jobs'), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

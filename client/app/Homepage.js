@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import './App.css';
+import { apiUrl } from '../lib/api';
 
 const App = () => {
   const router = useRouter();
@@ -60,7 +61,7 @@ const App = () => {
     const fetchJobs = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:5000/api/jobs');
+        const response = await fetch(apiUrl('/api/jobs'));
         if (!response.ok) {
           throw new Error('Failed to fetch jobs');
         }
