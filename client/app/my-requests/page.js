@@ -11,12 +11,12 @@ const sampleJobs = {
     category: 'Plumbing',
     subcategory: 'Plumbing & Repairs',
     serviceType: 'Home Repair',
-    location: 'Glasgow West End',
+    location: 'Colombo west end',
     budget: 'Not specified',
     status: 'Open',
     description: 'Urgent leak in master bathroom requires immediate attention. Sink pipe has burst and needs immediate repair to prevent water damage.',
     internalNotes: 'Sample request for homepage demo.',
-    client: { name: 'Sarah Johnson', email: 'sarah@example.com', phone: 'Not provided', verified: true }
+    client: { name: 'Sarah Johnson', email: 'sarah@gmail.com', phone: '0718596846', verified: true }
   },
   'sample-2': {
     id: 'sample-2',
@@ -24,12 +24,12 @@ const sampleJobs = {
     category: 'Painting',
     subcategory: 'Interior Painting',
     serviceType: 'Home Improvement',
-    location: 'Edinburgh City Centre',
+    location: 'Colombo Bambalapitiya',
     budget: 'Not specified',
     status: 'Open',
     description: 'High ceiling living room requires painting and light sanding. Neutral palette preferred. Materials provided by homeowner.',
     internalNotes: 'Sample request for homepage demo.',
-    client: { name: 'Michael Smith', email: 'michael@example.com', phone: 'Not provided', verified: true }
+    client: { name: 'Michael Smith', email: 'michael@gmail.com', phone: '0778437599', verified: true }
   },
   'sample-3': {
     id: 'sample-3',
@@ -37,25 +37,25 @@ const sampleJobs = {
     category: 'Electrical',
     subcategory: 'Electrical & Lighting',
     serviceType: 'Installation',
-    location: 'Stirling',
+    location: 'Colombo Wellawatte',
     budget: 'Not specified',
     status: 'In Progress',
     description: 'Certified electrician needed to install a new home charging station in a detached garage with new circuit.',
     internalNotes: 'Sample request for homepage demo.',
-    client: { name: 'Emma Davis', email: 'emma@example.com', phone: 'Not provided', verified: true }
+    client: { name: 'Emma Davis', email: 'emma@gmail.com', phone: '0769854128', verified: true }
   },
   'sample-4': {
     id: 'sample-4',
     title: 'Bespoke Fitted Wardrobe',
-    category: 'Joinery',
+    category: 'Colombo Dehiwala',
     subcategory: 'Custom Joinery',
     serviceType: 'Furniture Installation',
-    location: 'Bearden',
+    location: 'Colombo Dehiwala',
     budget: 'Not specified',
     status: 'Open',
     description: 'Custom oak wardrobe for a master bedroom. Design is ready, seeking a craftsman for execution and installation.',
     internalNotes: 'Sample request for homepage demo.',
-    client: { name: 'James Wilson', email: 'james@example.com', phone: 'Not provided', verified: true }
+    client: { name: 'James Wilson', email: 'james@gmail.com', phone: '0718596321', verified: true }
   }
 };
 
@@ -65,15 +65,15 @@ const fallbackJobData = {
   category: "Electrical",
   subcategory: "Electrical & Lighting",
   serviceType: "Home Renovation",
-  location: "San Francisco, CA",
+  location: "Colombo ,Moratuwa",
   budget: "$1,200 - $1,500",
   status: "New Request",
   description: "We are looking for a certified electrician to handle a full lighting redesign in our primary kitchen. The project includes the removal of existing fluorescent fixtures and the installation of 8 recessed LED cans, 3 pendant lights over the kitchen island, and under-cabinet accent lighting.\n\nThe project also requires a circuit upgrade to ensure the new induction stovetop and high-powered appliances are properly supported. All work must be completed to current city code standards and include professional finishing around the mounting points.",
   internalNotes: "High priority request. Client has requested completion before Thanksgiving. Ensure crew carries specialized pendant mounting hardware.",
   client: {
     name: "Robert Chen",
-    email: "r.chen@example.com",
-    phone: "+1 (415) 555-0192",
+    email: "r.chen@gmail.com",
+    phone: "0718596846",
     verified: true
   }
 };
@@ -318,20 +318,30 @@ const JobDetails = () => {
                 </div>
               </div>
 
-              {/* Internal Notes - Only visible to admin/service provider */}
-              <div className="info-card internal-notes">
-                <h3>📝 INTERNAL NOTES</h3>
-                {isEditing ? (
-                  <textarea
-                    name="internalNotes"
-                    value={editForm.internalNotes}
-                    onChange={handleEditChange}
-                    rows="4"
-                    className="edit-textarea"
+              {/* Service Location Map */}
+              <div className="info-card location-map-card">
+                <h3>Service Location</h3>
+                <div className="location-map-wrap">
+                  <img
+                    src="/map_location.jpg"
+                    alt="Service location map"
+                    className="location-map-image"
                   />
-                ) : (
-                  <p className="notes-text">{jobData.internalNotes}</p>
-                )}
+                </div>
+                <div className="location-map-details">
+                  <div className="location-icon">📍</div>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      name="location"
+                      value={editForm.location}
+                      onChange={handleEditChange}
+                      className="edit-input"
+                    />
+                  ) : (
+                    <span className="location-text">{jobData.location}</span>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -388,22 +398,7 @@ const JobDetails = () => {
 
               {/* Location & Budget */}
               <div className="info-card">
-                <h3>Service Location</h3>
-                <div className="location-info">
-                  <div className="location-icon">📍</div>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      name="location"
-                      value={editForm.location}
-                      onChange={handleEditChange}
-                      className="edit-input"
-                    />
-                  ) : (
-                    <span className="location-text">{jobData.location}</span>
-                  )}
-                </div>
-                
+                <h3>Budget</h3>
                 <div className="budget-info">
                   <h4>Estimated Budget</h4>
                   {isEditing ? (

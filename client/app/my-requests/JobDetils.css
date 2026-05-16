@@ -310,6 +310,28 @@ body {
 }
 
 /* Location & Budget */
+.location-map-card {
+  overflow: hidden;
+}
+
+.location-map-wrap {
+  margin-bottom: 1rem;
+}
+
+.location-map-image {
+  width: 100%;
+  display: block;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  object-fit: cover;
+}
+
+.location-map-details {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .location-info {
   display: flex;
   align-items: center;
