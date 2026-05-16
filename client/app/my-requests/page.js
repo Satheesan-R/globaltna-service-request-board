@@ -86,6 +86,7 @@ const JobDetails = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [savingStatus, setSavingStatus] = useState(false);
   
   // Job data state
   const [jobData, setJobData] = useState(fallbackJobData);
@@ -154,7 +155,7 @@ const JobDetails = () => {
     };
 
     fetchJobs();
-  }, []);
+  }, [requestId]);
 
   const handleEditChange = (e) => {
     const { name, value } = e.target;
@@ -164,11 +165,44 @@ const JobDetails = () => {
     }));
   };
 
-  const handleSaveChanges = () => {
-    setJobData(editForm);
-    setIsEditing(false);
-    // Show success message
-    alert('Changes saved successfully!');
+  // Update only status on change and persist to backend immediately
+  const updateStatus = async (e) => {
+    const newStatus = e.target.value;
+
+    // Do not attempt to update sample or fallback items
+    if (!jobData || !jobData.id || String(jobData.id).startsWith('sample') || String(jobData.id).startsWith('#')) {
+      alert('This request cannot be updated (sample or fallback).');
+      // revert editForm value
+      setEditForm(prev => ({ ...prev, status: jobData.status }));
+      return;
+    }
+
+    const prevStatus = jobData.status;
+    // optimistic update
+    setJobData(prev => ({ ...prev, status: newStatus }));
+    setSavingStatus(true);
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/jobs/${jobData.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to update status');
+      }
+
+      const updated = await res.json();
+      setJobData(prev => ({ ...prev, status: updated.status }));
+    } catch (err) {
+      console.error('Status update failed', err);
+      alert('Could not update status: ' + err.message);
+      // revert
+      setJobData(prev => ({ ...prev, status: prevStatus }));
+    } finally {
+      setSavingStatus(false);
+    }
   };
 
   const handleDeleteRequest = () => {
@@ -417,28 +451,27 @@ const JobDetails = () => {
 
               {/* Action Buttons */}
               <div className="action-buttons">
-                {!isEditing ? (
-                  <>
-                    <button className="btn-edit" onClick={() => setIsEditing(true)}>
-                       Save Changes
-                    </button>
-                    <button className="btn-delete" onClick={handleDeleteRequest}>
-                       Delete Request
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button className="btn-save" onClick={handleSaveChanges}>
-                       Save Changes
-                    </button>
-                    <button className="btn-cancel" onClick={() => {
-                      setIsEditing(false);
-                      setEditForm(jobData);
-                    }}>
-                       Cancel
-                    </button>
-                  </>
-                )}
+                <h2>Manage Request</h2>
+                <p>Change status to notify client; updates save automatically.</p>
+                <div className='choose'>
+                  <select
+                    name="status"
+                    value={jobData.status}
+                    onChange={updateStatus}
+                    className="status-select"
+                    disabled={savingStatus}
+                  >
+                    <option value="Open">Open</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Closed">Closed</option>
+                  </select>
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                  <button className="btn-delete" onClick={handleDeleteRequest}>
+                    Delete Request
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -469,7 +502,7 @@ const JobDetails = () => {
         <div className="container">
           <div className="footer-content">
             <div className="footer-logo">GlobalTNA</div>
-            <p className="copyright">© 2024 GlobalTNA Service Solutions. All rights reserved.</p>
+            <p className="copyright">© 2026 GlobalTNA Service Solutions. All rights reserved.</p>
           </div>
         </div>
       </footer>
