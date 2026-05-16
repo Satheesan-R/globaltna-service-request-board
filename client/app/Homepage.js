@@ -1,8 +1,12 @@
+"use client";
+
 // App.js
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import './App.css';
 
 const App = () => {
+  const router = useRouter();
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -15,7 +19,7 @@ const App = () => {
       title: 'Emergency Pipe Repair',
       description: 'Urgent leak in master bathroom requires immediate attention. Sink pipe has burst and needs...',
       location: 'Glasgow West End',
-      price: '£80 - £120',
+      price: 'LKR80 - LKR120',
       urgent: true,
     },
     {
@@ -24,7 +28,7 @@ const App = () => {
       title: 'Full Living Room Refresh',
       description: 'High ceiling living room requires painting and light sanding. Neutral palette preferred. Materials...',
       location: 'Edinburgh City Centre',
-      price: '£450 - £600',
+      price: 'LKR450 - LKR600',
       urgent: false,
     },
     {
@@ -33,7 +37,7 @@ const App = () => {
       title: 'EV Charger Installation',
       description: 'Certified electrician needed to install a new home charging station in a detached garage.',
       location: 'Stirling',
-      price: '£300 - £450',
+      price: 'LKR300 - LKR450',
       urgent: false,
     },
     {
@@ -42,7 +46,7 @@ const App = () => {
       title: 'Bespoke Fitted Wardrobe',
       description: 'Custom oak wardrobe for a master bedroom. Design is ready, seeking a craftsman for execution.',
       location: 'Bearden',
-      price: '£1,200+',
+      price: 'LKR1,200+',
       urgent: false,
     },
     {
@@ -51,7 +55,7 @@ const App = () => {
       title: 'Shower Valve Replacement',
       description: 'Replacement of an old thermostat shower valve in a rental property. Completed successfully.',
       location: 'Paisley',
-      price: '£150',
+      price: 'LKR150',
       urgent: false,
     },
     {
@@ -60,7 +64,7 @@ const App = () => {
       title: 'Kitchen Tap Replacement',
       description: 'Replacement of a leaking kitchen tap with a new modern mixer tap. All fittings provided.',
       location: 'Govan',
-      price: '£60 - £90',
+      price: 'LKR60 - LKR90',
       urgent: false,
     },
     {
@@ -69,7 +73,7 @@ const App = () => {
       title: 'Garden Fence Repair',
       description: 'Repairing several storm-damaged panels of a perimeter garden fence. Timber to be matched with',
       location: 'West End',
-      price: '£200 - £350',
+      price: 'LKR200 - LKR350',
       urgent: false,
     },
     {
@@ -78,7 +82,7 @@ const App = () => {
       title: 'Electrical Safety Check',
       description: 'Full inspection and testing of domestic electrical installation for a landlord certificate (EICR).',
       location: 'City Centre',
-      price: '£210 - £180',
+      price: 'LKR210 - LKR180',
       urgent: false,
     },
   ];
@@ -102,6 +106,16 @@ const App = () => {
     }
   };
 
+  const getCategoryImage = (category) => {
+    switch(category.toLowerCase()) {
+      case 'plumbing': return '/images/plumbing.svg';
+      case 'electrical': return '/images/electrical.svg';
+      case 'painting': return '/images/painting.svg';
+      case 'joinery': return '/images/joinery.svg';
+      default: return '/images/default.svg';
+    }
+  };
+
   return (
     <div className="homepage">
       {/* Navigation Bar */}
@@ -109,12 +123,18 @@ const App = () => {
         <div className="nav-container">
           <div className="logo">GlobalTNA</div>
           <div className="nav-links">
-            <a href="#" className="active">Jobs</a>
-            <a href="#">My Requests</a>
+            <a href="/home">Home</a>
+            <a href="/jobForm" className="active">Jobs</a>
+            <a href="/my-requests">My Requests</a>
           </div>
           <div className="nav-buttons">
-            <button className="btn-outline">Sign In</button>
-            <button className="btn-primary">Post Your Job</button>
+           
+            <button className="btn-outline" onClick={() => router.push("/login")}>
+              Sign In
+            </button>
+            <button className="btn-primary" onClick={() => router.push("/jobForm")}>
+              Post Your Job
+            </button>
           </div>
         </div>
       </nav>
@@ -125,8 +145,12 @@ const App = () => {
           <h1>Find Skilled Pros for <span className="highlight">Your Next Project</span></h1>
           <p>Connecting homeowners in Glasgow and beyond with verified specialists in plumbing, electrical, painting, and joinery.</p>
           <div className="hero-buttons">
-            <button className="btn-large btn-primary">Post Your Job</button>
-            <button className="btn-large btn-outline">Browse Marketplace</button>
+            <button className="btn-large btn-primary" onClick={() => router.push("/jobForm")}>
+              Post Your Job
+            </button>
+            <button className="btn-large btn-outline" onClick={() => router.push("/my-requests")}>
+              Browse Marketplace
+            </button>
           </div>
         </div>
       </section>
@@ -171,7 +195,15 @@ const App = () => {
           <div className="requests-grid">
             {filteredRequests.map(request => (
               <div key={request.id} className="request-card">
-                <div className="card-category" style={{ backgroundColor: getCategoryColor(request.category) }}>
+                <div className="card-category" 
+                  style={{
+                    backgroundColor: getCategoryColor(request.category),
+                   backgroundImage: `url(${getCategoryImage(request.category)})`,
+                   backgroundSize: 'cover',
+                   backgroundPosition: 'center',
+                  backgroundBlendMode: 'overlay'
+                          }}
+                      >
                   {getCategoryIcon(request.category)} {request.category}
                 </div>
                 <h3 className="card-title">{request.title}</h3>
@@ -193,23 +225,14 @@ const App = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="cta-section">
-        <div className="container">
-          <div className="cta-content">
-            <h2>Have a project?</h2>
-            <p>Join hundreds of homeowners and post your request to our skilled professional network.</p>
-            <button className="btn-large btn-white">Post a Job Now</button>
-          </div>
-        </div>
-      </section>
+     
 
       {/* Footer */}
       <footer className="footer">
         <div className="container">
           <div className="footer-content">
             <div className="footer-logo">GlobalTNA</div>
-            <p>© 2024 GlobalTNA. Professional Services Marketplace.</p>
+            <p>© 2026 GlobalTNA. Professional Services Marketplace.</p>
           </div>
         </div>
       </footer>

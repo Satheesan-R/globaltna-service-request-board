@@ -347,6 +347,11 @@ body {
   color: #64748b;
 }
 
+.card-plumbing { background-image: url('/serv1.png'); }
+.card-electrical { background-image: url('/serv2.png'); }
+.card-painting { background-image: url('/serv3.png'); }
+.card-joinery { background-image: url('/serv4.png'); }
+
 /* CTA Section */
 .cta-section {
   background: linear-gradient(135deg, #0a2540, #1a4a6e);

@@ -1,6 +1,6 @@
 import RegisterPage from "./register/page";
 
-export default function Home() {
+export default function Register() {
   return <RegisterPage />;
         
 }
