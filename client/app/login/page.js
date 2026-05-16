@@ -51,7 +51,7 @@ export default function LoginPage() {
           sessionStorage.setItem("userToken", data.token);
         }
         setMessage("Login successful! Redirecting...");
-        setTimeout(() => router.push("/dashboard"), 1000);
+        setTimeout(() => router.push("/home"), 1000);
       } else {
         setMessage(data.message || "Login failed. Please check your credentials.");
       }
