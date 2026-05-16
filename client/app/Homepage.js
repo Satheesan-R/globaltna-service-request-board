@@ -1,7 +1,7 @@
 "use client";
 
 // App.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import './App.css';
 
@@ -9,83 +9,77 @@ const App = () => {
   const router = useRouter();
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [serviceRequests, setServiceRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const categories = ['All', 'Plumbing', 'Electrical', 'Painting', 'Joinery'];
 
-  const serviceRequests = [
+  // Hardcoded sample data
+  const sampleData = [
     {
-      id: 1,
+      _id: 'sample-1',
       category: 'Plumbing',
       title: 'Emergency Pipe Repair',
-      description: 'Urgent leak in master bathroom requires immediate attention. Sink pipe has burst and needs...',
+      description: 'Urgent leak in master bathroom requires immediate attention. Sink pipe has burst and needs immediate repair to prevent water damage.',
       location: 'Glasgow West End',
-      price: 'LKR80 - LKR120',
-      urgent: true,
+      status: 'Open',
+      contactName: 'Sarah Johnson',
     },
     {
-      id: 2,
+      _id: 'sample-2',
       category: 'Painting',
       title: 'Full Living Room Refresh',
-      description: 'High ceiling living room requires painting and light sanding. Neutral palette preferred. Materials...',
+      description: 'High ceiling living room requires painting and light sanding. Neutral palette preferred. Materials provided by homeowner.',
       location: 'Edinburgh City Centre',
-      price: 'LKR450 - LKR600',
-      urgent: false,
+      status: 'Open',
+      contactName: 'Michael Smith',
     },
     {
-      id: 3,
+      _id: 'sample-3',
       category: 'Electrical',
       title: 'EV Charger Installation',
-      description: 'Certified electrician needed to install a new home charging station in a detached garage.',
+      description: 'Certified electrician needed to install a new home charging station in a detached garage with new circuit.',
       location: 'Stirling',
-      price: 'LKR300 - LKR450',
-      urgent: false,
+      status: 'In Progress',
+      contactName: 'Emma Davis',
     },
     {
-      id: 4,
+      _id: 'sample-4',
       category: 'Joinery',
       title: 'Bespoke Fitted Wardrobe',
-      description: 'Custom oak wardrobe for a master bedroom. Design is ready, seeking a craftsman for execution.',
+      description: 'Custom oak wardrobe for a master bedroom. Design is ready, seeking a craftsman for execution and installation.',
       location: 'Bearden',
-      price: 'LKR1,200+',
-      urgent: false,
-    },
-    {
-      id: 5,
-      category: 'Plumbing',
-      title: 'Shower Valve Replacement',
-      description: 'Replacement of an old thermostat shower valve in a rental property. Completed successfully.',
-      location: 'Paisley',
-      price: 'LKR150',
-      urgent: false,
-    },
-    {
-      id: 6,
-      category: 'Plumbing',
-      title: 'Kitchen Tap Replacement',
-      description: 'Replacement of a leaking kitchen tap with a new modern mixer tap. All fittings provided.',
-      location: 'Govan',
-      price: 'LKR60 - LKR90',
-      urgent: false,
-    },
-    {
-      id: 7,
-      category: 'Joinery',
-      title: 'Garden Fence Repair',
-      description: 'Repairing several storm-damaged panels of a perimeter garden fence. Timber to be matched with',
-      location: 'West End',
-      price: 'LKR200 - LKR350',
-      urgent: false,
-    },
-    {
-      id: 8,
-      category: 'Electrical',
-      title: 'Electrical Safety Check',
-      description: 'Full inspection and testing of domestic electrical installation for a landlord certificate (EICR).',
-      location: 'City Centre',
-      price: 'LKR210 - LKR180',
-      urgent: false,
+      status: 'Open',
+      contactName: 'James Wilson',
     },
   ];
+
+  // Fetch jobs from backend
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:5000/api/jobs');
+        if (!response.ok) {
+          throw new Error('Failed to fetch jobs');
+        }
+        const data = await response.json();
+        // Combine sample data with fetched data
+        setServiceRequests([...sampleData, ...data]);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching jobs:', err);
+        setError(err.message);
+        // Show only sample data if fetch fails
+        setServiceRequests(sampleData);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, []);
 
   const filteredRequests = serviceRequests.filter(request => {
     const matchesCategory = activeCategory === 'all' || 
@@ -192,35 +186,53 @@ const App = () => {
             </div>
           </div>
 
-          <div className="requests-grid">
-            {filteredRequests.map(request => (
-              <div key={request.id} className="request-card">
-                <div className="card-category" 
-                  style={{
-                    backgroundColor: getCategoryColor(request.category),
-                   backgroundImage: `url(${getCategoryImage(request.category)})`,
-                   backgroundSize: 'cover',
-                   backgroundPosition: 'center',
-                  backgroundBlendMode: 'overlay'
-                          }}
-                      >
-                  {getCategoryIcon(request.category)} {request.category}
-                </div>
-                <h3 className="card-title">{request.title}</h3>
-                <p className="card-description">{request.description}</p>
-                <div className="card-footer">
-                  <div className="card-location">📍 {request.location}</div>
-                  <div className="card-price">{request.price}</div>
-                </div>
-                {request.urgent && <span className="urgent-badge">URGENT</span>}
-              </div>
-            ))}
-          </div>
-
-          {filteredRequests.length === 0 && (
-            <div className="no-results">
-              <p>No service requests found. Try a different category or search term.</p>
+          {loading && (
+            <div className="loading-state">
+              <p>Loading service requests...</p>
             </div>
+          )}
+
+          {error && (
+            <div className="error-state">
+              <p>Error loading requests: {error}</p>
+            </div>
+          )}
+
+          {!loading && !error && (
+            <>
+              <div className="requests-grid">
+                {filteredRequests.map(request => (
+                  <div key={request._id} className="request-card">
+                    <div className="card-category" 
+                      style={{
+                        backgroundColor: getCategoryColor(request.category),
+                       backgroundImage: `url(${getCategoryImage(request.category)})`,
+                       backgroundSize: 'cover',
+                       backgroundPosition: 'center',
+                      backgroundBlendMode: 'overlay'
+                              }}
+                          >
+                      {getCategoryIcon(request.category)} {request.category}
+                    </div>
+                    <h3 className="card-title">{request.title}</h3>
+                    <p className="card-description">{request.description}</p>
+                    <div className="card-footer">
+                      <div className="card-location">📍 {request.location}</div>
+                      <div className="card-status">{request.status}</div>
+                    </div>
+                    <div className="card-contact">
+                      <small>By: {request.contactName}</small>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {filteredRequests.length === 0 && (
+                <div className="no-results">
+                  <p>No service requests found. Try a different category or search term.</p>
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>
