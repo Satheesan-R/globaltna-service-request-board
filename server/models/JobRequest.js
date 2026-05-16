@@ -5,6 +5,8 @@ const jobRequestSchema = new mongoose.Schema({
   description: { type: String, required: true },
   category: { type: String, required: true },
   location: { type: String, required: true },
+  Address: { type: String, required: true },
+  phonenumber: { type: String },
   contactName: { type: String, required: true },
   contactEmail: {
     type: String, required: true, unique: true,

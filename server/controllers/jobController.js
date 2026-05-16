@@ -39,7 +39,7 @@ const getJobById = async (req, res, next) => {
 // POST create job
 const createJob = async (req, res, next) => {
   try {
-    const { title, description, category, location, contactName, contactEmail } = req.body;
+    const { title, description, category, location, address, contactName, contactEmail, phonenumber } = req.body;
 
     if (!title || !description) {
       return res.status(400).json({
@@ -52,8 +52,10 @@ const createJob = async (req, res, next) => {
       description,
       category,
       location,
+      Address: address || '',
       contactName,
-      contactEmail
+      contactEmail,
+      phonenumber: phonenumber || ''
     });
 
     res.status(201).json(newJob);

@@ -14,9 +14,11 @@ const SubmitRequest = () => {
     description: '',
     contactName: '',
     contactEmail: '',
+    phonenumber: '',
   });
 
   const [errors, setErrors] = useState({});
+  const [success, setSuccess] = useState(false);
 
   const categories = ['Plumbing', 'Electrical', 'Painting', 'Joinery', 'Carpentry', 'HVAC', 'Landscaping', 'Other'];
 
@@ -72,21 +74,83 @@ const SubmitRequest = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (validateForm()) {
-      // Handle form submission here
-      console.log('Form submitted:', formData);
-      // Redirect to success page or show success message
-      alert('Service request submitted successfully!');
-      router.push('/');
+      try {
+        const response = await fetch('http://localhost:5000/api/jobs', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            title: formData.jobTitle,
+            category: formData.category,
+            location: formData.location,
+            address: formData.address,
+            description: formData.description,
+            contactName: formData.contactName,
+            contactEmail: formData.contactEmail,
+            phonenumber: formData.phonenumber
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setSuccess(true);
+          setTimeout(() => router.push('/home'), 2500);
+        } else {
+          alert(data.message || 'Failed to submit request. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error submitting form:', error);
+        alert('Network error. Please check your connection and try again.');
+      }
     }
   };
 
   const handleCancel = () => {
     router.back();
   };
+
+  if (success) {
+    return (
+      <div className="submit-request-page">
+        <nav className="navbar">
+          <div className="nav-container">
+            <div className="logo">GlobalTNA</div>
+          </div>
+        </nav>
+        <section className="success-section">
+          <div className="success-container">
+            <div className="success-icon">✅</div>
+            <h1>Success!</h1>
+            <p className="success-message">Your service request has been submitted successfully!</p>
+            <p className="success-details">We've received your request and will notify qualified professionals in your area. You'll receive updates via email at <strong>{formData.contactEmail}</strong>.</p>
+            <div className="success-next-steps">
+              <h3>What happens next?</h3>
+              <ol>
+                <li>Professionals in your area review your request</li>
+                <li>You'll receive competitive bids within 24-48 hours</li>
+                <li>Choose the best professional and hire securely</li>
+              </ol>
+            </div>
+            <p className="redirecting-text">Redirecting you to home in a moment...</p>
+          </div>
+        </section>
+        <footer className="footer">
+          <div className="container">
+            <div className="footer-content">
+              <div className="footer-logo">GlobalTNA</div>
+              <p>© 2024 GlobalTNA. Professional Services Marketplace.</p>
+            </div>
+          </div>
+        </footer>
+      </div>
+    );
+  }
 
   return (
     <div className="submit-request-page">
@@ -140,9 +204,7 @@ const SubmitRequest = () => {
               <p>Choose the best professional and pay securely through GlobalTNA.</p>
             </div>
           </div>
-          <div className="tip-banner">
-            <p>📸 <strong>Pro Tip:</strong> Be sure to include photos if possible after posting, as jobs with images receive <strong>3x more professional interest</strong>.</p>
-          </div>
+         
         </div>
       </section>
 
@@ -277,6 +339,23 @@ const SubmitRequest = () => {
                     />
                     {errors.contactEmail && <span className="error-message">{errors.contactEmail}</span>}
                   </div>
+
+                   <div className="form-group">
+                    <label htmlFor="phonenumber">
+                      Phone number <span className="required">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="phonenumber"
+                      name="phonenumber"
+                      placeholder="Your phone number"
+                      value={formData.phonenumber}
+                      onChange={handleChange}
+                      className={errors.phonenumber ? 'error' : ''}
+                    />
+                    {errors.phonenumber && <span className="error-message">{errors.phonenumber}</span>}
+                  </div>
+
                 </div>
 
                 <div className="security-note">
@@ -290,7 +369,7 @@ const SubmitRequest = () => {
                 <button type="button" className="btn-secondary" onClick={handleCancel}>
                   Cancel
                 </button>
-                <button type="submit" className="btn-primary" onClick={() => router.push("/home")}>
+                <button type="submit" className="btn-primary">
                   Submit Request
                 </button>
               </div>
