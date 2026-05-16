@@ -113,6 +113,49 @@ Schema file: `server/models/JobRequest.js`.
 - Add notifications/email on status changes
 - Add pagination and filters on the jobs listing
 
+## Deployment
+
+This project is split into two separate deploys:
+
+- Frontend: `client/` on Vercel
+- Backend: `server/` on Render
+
+### 1) Deploy the backend to Render
+
+1. Create a new Web Service in Render and connect this repository.
+2. Set the Root Directory to `server`.
+3. Use these values:
+	- Build Command: `npm install`
+	- Start Command: `npm start`
+4. Add these environment variables in Render:
+	- `MONGO_URI` = your MongoDB connection string
+	- `JWT_SECRET` = a strong secret string
+	- `PORT` = `10000` or leave it unset and let Render assign one
+5. Deploy the service and copy the live backend URL, for example `https://your-service.onrender.com`.
+
+### 2) Deploy the frontend to Vercel
+
+1. Create a new project in Vercel and import the same repository.
+2. Set the Root Directory to `client`.
+3. Add this environment variable in Vercel:
+	- `NEXT_PUBLIC_API_URL` = your Render backend URL, for example `https://your-service.onrender.com`
+4. Deploy the project.
+5. After deployment, open the Vercel URL and verify that login, register, job creation, and request listing all talk to the Render backend.
+
+### Common issues
+
+- If Vercel shows a 404, the Root Directory is usually wrong. It must be `client`.
+- If the frontend cannot reach the backend, check `NEXT_PUBLIC_API_URL`.
+- If Render fails to start, check `MONGO_URI`, `JWT_SECRET`, and the Render logs.
+- If browser requests are blocked, confirm CORS is enabled in `server/server.js`.
+
+### Live URLs
+
+After both deploys finish, add your live URLs here:
+
+- Frontend: `https://your-vercel-app.vercel.app`
+- Backend: `https://your-render-service.onrender.com`
+
 ## Contributing
 - Fork the repo, create a branch, open a PR. Keep changes focused and add tests where appropriate.
 
