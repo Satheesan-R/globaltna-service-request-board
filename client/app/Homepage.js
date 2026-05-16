@@ -223,6 +223,12 @@ const App = () => {
                     <div className="card-contact">
                       <small>By: {request.contactName}</small>
                     </div>
+                    <button
+                      className="card-view-details"
+                      onClick={() => router.push(`/my-requests?id=${request._id}`)}
+                    >
+                      View Details
+                    </button>
                   </div>
                 ))}
               </div>

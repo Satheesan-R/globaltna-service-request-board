@@ -13,7 +13,7 @@ export default function RegisterPage() {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "homeowner",
+    role: "",
     agreeTerms: false
   });
 
@@ -146,7 +146,8 @@ export default function RegisterPage() {
 
             <div className="input-group">
               <label>Role</label>
-              <select name="role" value={formData.role} onChange={handleChange}>
+              <select name="role" value={formData.role} onChange={handleChange} required>
+                <option value="">Select your role</option>
                 <option value="homeowner">Homeowner</option>
                 <option value="tradesperson">Tradesperson</option>
               </select>
