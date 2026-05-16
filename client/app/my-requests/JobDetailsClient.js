@@ -1,176 +1,89 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import './JobDetils.css';
 import { apiUrl } from '../../lib/api';
 
 const sampleJobs = {
   'sample-1': {
-    id: 'sample-1',
+    _id: 'sample-1',
     title: 'Emergency Pipe Repair',
     category: 'Plumbing',
-    subcategory: 'Plumbing & Repairs',
-    serviceType: 'Home Repair',
-    location: 'Colombo west end',
-    budget: 'Not specified',
-    status: 'Open',
+    location: 'Colombo West',
+    Address: '12 Lake View Road, Colombo',
     description: 'Urgent leak in master bathroom requires immediate attention. Sink pipe has burst and needs immediate repair to prevent water damage.',
-    internalNotes: 'Sample request for homepage demo.',
-    client: { name: 'Sarah Johnson', email: 'sarah@gmail.com', phone: '0718596846', verified: true }
+    contactName: 'Sarah Johnson',
+    contactEmail: 'sarah@example.com',
+    phonenumber: '0718596846',
+    status: 'Open',
+    createdAt: new Date().toISOString()
   },
   'sample-2': {
-    id: 'sample-2',
-    title: 'Full Living Room Refresh',
-    category: 'Painting',
-    subcategory: 'Interior Painting',
-    serviceType: 'Home Improvement',
-    location: 'Colombo Bambalapitiya',
-    budget: 'Not specified',
-    status: 'Open',
-    description: 'High ceiling living room requires painting and light sanding. Neutral palette preferred. Materials provided by homeowner.',
-    internalNotes: 'Sample request for homepage demo.',
-    client: { name: 'Michael Smith', email: 'michael@gmail.com', phone: '0778437599', verified: true }
-  },
-  'sample-3': {
-    id: 'sample-3',
-    title: 'EV Charger Installation',
+    _id: 'sample-2',
+    title: 'Electrical Rewiring',
     category: 'Electrical',
-    subcategory: 'Electrical & Lighting',
-    serviceType: 'Installation',
-    location: 'Colombo Wellawatte',
-    budget: 'Not specified',
+    location: 'Jaffna',
+    Address: '45 Market St, Jaffna',
+    description: 'Minor rewiring needed in kitchen and living area. Some outlets are loose and breakers trip occasionally.',
+    contactName: 'Kumar Fernando',
+    contactEmail: 'kumar@example.com',
+    phonenumber: '0771234567',
     status: 'In Progress',
-    description: 'Certified electrician needed to install a new home charging station in a detached garage with new circuit.',
-    internalNotes: 'Sample request for homepage demo.',
-    client: { name: 'Emma Davis', email: 'emma@gmail.com', phone: '0769854128', verified: true }
-  },
-  'sample-4': {
-    id: 'sample-4',
-    title: 'Bespoke Fitted Wardrobe',
-    category: 'Colombo Dehiwala',
-    subcategory: 'Custom Joinery',
-    serviceType: 'Furniture Installation',
-    location: 'Colombo Dehiwala',
-    budget: 'Not specified',
-    status: 'Open',
-    description: 'Custom oak wardrobe for a master bedroom. Design is ready, seeking a craftsman for execution and installation.',
-    internalNotes: 'Sample request for homepage demo.',
-    client: { name: 'James Wilson', email: 'james@gmail.com', phone: '0718596321', verified: true }
-  }
-};
-
-const fallbackJobData = {
-  id: "#G-88291",
-  title: "Modern Kitchen Lighting Installation and Rewiring",
-  category: "Electrical",
-  subcategory: "Electrical & Lighting",
-  serviceType: "Home Renovation",
-  location: "Colombo ,Moratuwa",
-  budget: "$1,200 - $1,500",
-  status: "New Request",
-  description: "We are looking for a certified electrician to handle a full lighting redesign in our primary kitchen. The project includes the removal of existing fluorescent fixtures and the installation of 8 recessed LED cans, 3 pendant lights over the kitchen island, and under-cabinet accent lighting.\n\nThe project also requires a circuit upgrade to ensure the new induction stovetop and high-powered appliances are properly supported. All work must be completed to current city code standards and include professional finishing around the mounting points.",
-  internalNotes: "High priority request. Client has requested completion before Thanksgiving. Ensure crew carries specialized pendant mounting hardware.",
-  client: {
-    name: "Robert Chen",
-    email: "r.chen@gmail.com",
-    phone: "0718596846",
-    verified: true
+    createdAt: new Date().toISOString()
   }
 };
 
 const JobDetails = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const requestId = searchParams.get('id');
-  const [isEditing, setIsEditing] = useState(false);
+  const requestId = searchParams ? searchParams.get('id') : null;
+  // only status is editable by client
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [savingStatus, setSavingStatus] = useState(false);
   
-  const [jobData, setJobData] = useState(fallbackJobData);
+  // Job data state (mapped from DB)
+  const [jobData, setJobData] = useState({
+    id: '',
+    title: '',
+    category: '',
+    subcategory: '',
+    serviceType: '',
+    location: '',
+    Address: '',
+    budget: '',
+    status: '',
+    description: '',
+    internalNotes: '',
+    client: { name: '', email: '', phone: '', verified: false },
+    createdAt: null
+  });
+
   const [editForm, setEditForm] = useState({ ...jobData });
-
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        if (requestId && sampleJobs[requestId]) {
-          const sampleJob = sampleJobs[requestId];
-          setJobData(sampleJob);
-          setEditForm(sampleJob);
-          setError(null);
-          setLoading(false);
-          return;
-        }
-
-        const response = await fetch(apiUrl('/api/jobs'));
-        if (!response.ok) {
-          throw new Error('Failed to fetch requests');
-        }
-
-        const jobs = await response.json();
-
-        const selectedJob = requestId ? jobs.find((job) => job._id === requestId) : jobs[0];
-
-        if (selectedJob) {
-          const mappedJob = {
-            id: selectedJob._id,
-            title: selectedJob.title || 'Untitled Request',
-            category: selectedJob.category || 'Other',
-            subcategory: selectedJob.category || 'Service Request',
-            serviceType: 'Home Service',
-            location: selectedJob.location || 'Unknown location',
-            budget: 'Not specified',
-            status: selectedJob.status || 'Open',
-            description: selectedJob.description || '',
-            internalNotes: 'Loaded from backend jobs collection.',
-            client: {
-              name: selectedJob.contactName || 'Unknown Client',
-              email: selectedJob.contactEmail || 'no-email@example.com',
-              phone: selectedJob.phonenumber || 'Not provided',
-              verified: true
-            }
-          };
-
-          setJobData(mappedJob);
-          setEditForm(mappedJob);
-        } else {
-          setJobData(fallbackJobData);
-          setEditForm(fallbackJobData);
-        }
-
-        setError(null);
-      } catch (fetchError) {
-        console.error('Error loading request:', fetchError);
-        setError(fetchError.message);
-        setJobData(fallbackJobData);
-        setEditForm(fallbackJobData);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchJobs();
-  }, [requestId]);
 
   const handleEditChange = (e) => {
     const { name, value } = e.target;
-    setEditForm(prev => ({ ...prev, [name]: value }));
+    setEditForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
-  const updateStatus = async (e) => {
-    const newStatus = e.target.value;
-    if (!jobData || !jobData.id || String(jobData.id).startsWith('sample') || String(jobData.id).startsWith('#')) {
-      alert('This request cannot be updated (sample or fallback).');
-      setEditForm(prev => ({ ...prev, status: jobData.status }));
+  const handleSaveChanges = async () => {
+    // Update local fields immediately
+    setJobData(prev => ({ ...prev, ...editForm }));
+
+    const newStatus = editForm.status;
+
+    // If this is a sample or fallback item, do not call the backend
+    if (!jobData.id || String(jobData.id).startsWith('sample') || String(jobData.id).startsWith('#')) {
+      alert('Changes saved locally (sample or fallback item).');
       return;
     }
 
-    const prevStatus = jobData.status;
-    setJobData(prev => ({ ...prev, status: newStatus }));
     setSavingStatus(true);
-
     try {
       const res = await fetch(apiUrl(`/api/jobs/${jobData.id}`), {
         method: 'PATCH',
@@ -179,23 +92,41 @@ const JobDetails = () => {
       });
 
       if (!res.ok) {
-        throw new Error('Failed to update status');
+        const txt = await res.text();
+        throw new Error(txt || 'Failed to update status');
       }
 
       const updated = await res.json();
+      // Apply server return to local state
       setJobData(prev => ({ ...prev, status: updated.status }));
+      setEditForm(prev => ({ ...prev, status: updated.status }));
+      alert('Changes saved successfully!');
     } catch (err) {
-      console.error('Status update failed', err);
-      alert('Could not update status: ' + err.message);
-      setJobData(prev => ({ ...prev, status: prevStatus }));
+      console.error('Save failed', err);
+      alert('Save failed: ' + (err.message || 'Unknown error'));
+      // revert local status to previous
+      setJobData(prev => ({ ...prev, status: jobData.status }));
+      setEditForm(prev => ({ ...prev, status: jobData.status }));
     } finally {
       setSavingStatus(false);
     }
   };
 
-  const handleDeleteRequest = () => setShowDeleteModal(true);
-  const confirmDelete = () => { setShowDeleteModal(false); router.push('/jobForm'); };
-  const cancelDelete = () => setShowDeleteModal(false);
+  const handleDeleteRequest = () => {
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = () => {
+    // Handle delete logic here
+    console.log('Deleting request:', jobData.id);
+    setShowDeleteModal(false);
+    // Redirect to jobs board
+    router.push('/jobs');
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+  };
 
   const getCategoryIcon = (category) => {
     switch(category.toLowerCase()) {
@@ -217,32 +148,266 @@ const JobDetails = () => {
     return colors[category] || '#7f8c8d';
   };
 
+  useEffect(() => {
+    const fetchJob = async () => {
+      if (!requestId) return;
+      // handle sample ids locally
+      if (requestId.startsWith('sample') && sampleJobs[requestId]) {
+        const job = sampleJobs[requestId];
+        const mapped = {
+          id: job._id,
+          title: job.title,
+          category: job.category,
+          subcategory: job.category,
+          serviceType: '',
+          location: job.location,
+          Address: job.Address || '',
+          budget: '',
+          status: job.status || '',
+          description: job.description || '',
+          internalNotes: '',
+          client: {
+            name: job.contactName || '',
+            email: job.contactEmail || '',
+            phone: job.phonenumber || '',
+            verified: true
+          },
+          createdAt: job.createdAt || null
+        };
+        setJobData(mapped);
+        setEditForm(mapped);
+        return;
+      }
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(apiUrl(`/api/jobs/${requestId}`));
+        if (!res.ok) throw new Error('Failed to load request from server');
+        const job = await res.json();
+        // Map server fields to UI shape
+        const mapped = {
+          id: job._id || job.id || '',
+          title: job.title || '',
+          category: job.category || '',
+          subcategory: job.category || '',
+          serviceType: '',
+          location: job.location || '',
+          Address: job.Address || job.address || '',
+          budget: '',
+          status: job.status || '',
+          description: job.description || '',
+          internalNotes: '',
+          client: {
+            name: job.contactName || '',
+            email: job.contactEmail || '',
+            phone: job.phonenumber || '',
+            verified: true
+          },
+          createdAt: job.createdAt || null
+        };
+
+        setJobData(mapped);
+        setEditForm(mapped);
+      } catch (err) {
+        console.error(err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJob();
+  }, [requestId]);
+
   return (
     <div className="job-details-page">
-      {loading && (<div className="loading-banner">Loading your request from the backend...</div>)}
-      {error && !loading && (<div className="loading-banner error-banner">Backend unavailable, showing sample request instead.</div>)}
-
+      {/* Navigation Bar */}
       <nav className="navbar">
         <div className="nav-container">
           <div className="logo">GlobalTNA</div>
+          <div className="nav-links">
+            <a href="/home">Home</a>
+            <a href="/jobs" className="active">Jobs</a>
+            <a href="/my-requests">My Requests</a>
+          </div>
+          <div className="nav-buttons">
+            <button className="btn-outline" onClick={() => router.push("/login")}>
+              Sign In
+            </button>
+            <button className="btn-primary" onClick={() => router.push("/post-job")}>
+              Post Your Job
+            </button>
+          </div>
         </div>
       </nav>
 
-      <main className="container">
-        <section className="job-header">
-          <h1>{jobData.title}</h1>
-          <div className="meta">
-            <span className="category" style={{background:getCategoryColor(jobData.category)}}>{getCategoryIcon(jobData.category)} {jobData.category}</span>
-            <span className="location">{jobData.location}</span>
+      {/* Main Content */}
+      <div className="main-container">
+        <div className="container">
+          {/* Back Button */}
+          <button className="back-button" onClick={() => router.back()}>
+            ← Back to job board
+          </button>
+          {!requestId && (
+            <section className="job-list">
+              <h2>Sample Requests</h2>
+              <div className="job-list-grid">
+                {Object.values(sampleJobs).map((job) => (
+                  <div key={job._id} className="job-card" onClick={() => router.push(`/my-requests?id=${job._id}`)}>
+                    <h3>{job.title}</h3>
+                    <div className="meta">
+                      <span className="category" style={{background:getCategoryColor(job.category)}}>{getCategoryIcon(job.category)} {job.category}</span>
+                      <span className="location">{job.location}</span>
+                    </div>
+                    <p>{job.description.length > 140 ? job.description.slice(0,140) + '...' : job.description}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+          <div className="details-grid">
+            {/* Left Column - Job Information */}
+            <div className="left-column">
+              {/* Job Header */}
+              <div className="job-header">
+                <div className="job-title-section">
+                  <h1>{jobData.title}</h1>
+                  <div className="job-meta">
+                    <span className="category-badge" style={{ backgroundColor: getCategoryColor(jobData.category) }}>
+                      {getCategoryIcon(jobData.category)} {jobData.category}
+                    </span>
+                    <span className="job-id">ID: {jobData.id}</span>
+                    <span className="status-badge status-new">{jobData.status}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Job Description */}
+              <div className="info-card">
+                <h3>Job Description</h3>
+                    <p className="description-text">{jobData.description}</p>
+              </div>
+
+              {/* Service Details */}
+              <div className="info-card">
+                <h3>Service Details</h3>
+                <div className="details-list">
+                  <div className="detail-item">
+                    <span className="detail-label">Category:</span>
+                    <span className="detail-value">{jobData.subcategory}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Service Type:</span>
+                    <span className="detail-value">{jobData.serviceType}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Internal Notes - Only visible to admin/service provider */}
+              <div className="info-card location-map-card">
+                <h3> Location Map</h3>
+                <div className="map-image-wrap">
+                  <img src="/map_location.jpg" alt="Location map" className="location-map" />
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column - Client & Location Info */}
+            <div className="right-column">
+              {/* Client Information */}
+              <div className="info-card">
+                <h3>Client Information</h3>
+                <div className="client-info">
+                  <div className="client-name">
+                    <strong>{jobData.client.name}</strong>
+                    {jobData.client.verified && (
+                      <span className="verified-badge">✓ Verified Homeowner</span>
+                    )}
+                  </div>
+                  {jobData.createdAt && (
+                    <div className="posted-date">Posted: {new Date(jobData.createdAt).toLocaleString()}</div>
+                  )}
+                  <div className="client-contact">
+                    <div className="contact-item">
+                      <span className="contact-icon">📧</span>
+                      <a href={`mailto:${jobData.client.email}`}>{jobData.client.email}</a>
+                    </div>
+                    <div className="contact-item">
+                      <span className="contact-icon">📞</span>
+                      <a href={`tel:${jobData.client.phone}`}>{jobData.client.phone}</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Location & Budget */}
+              <div className="info-card">
+                <h3>Service Location</h3>
+                <div className="location-info">
+                  <div className="location-icon">📍</div>
+                  <span className="location-text">{jobData.location}</span>
+                </div>
+                {jobData.Address && (
+                  <div className="address-line">Address: {jobData.Address}</div>
+                )}
+                
+                <div className="budget-info">
+                  <h4>Estimated Budget</h4>
+                  <p className="budget-amount">{jobData.budget}</p>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="action-buttons">
+                <div className="status-control">
+                  <label htmlFor="status-select">Status</label>
+                  <select id="status-select" name="status" value={editForm.status || jobData.status || ''} onChange={handleEditChange} className="status-select">
+                    <option value="">-- Select status --</option>
+                    <option value="Open">Open</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Closed">Closed</option>
+                  </select>
+                </div>
+                <button className="btn-save" onClick={handleSaveChanges} disabled={savingStatus}>
+                  {savingStatus ? 'Saving...' : '💾 Save Status'}
+                </button>
+                <button className="btn-delete" onClick={handleDeleteRequest}>
+                  🗑️ Delete Request
+                </button>
+              </div>
+            </div>
           </div>
-        </section>
+        </div>
+      </div>
 
-        <section className="job-body">
-          <h2>Description</h2>
-          <p>{jobData.description}</p>
-        </section>
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Delete Service Request</h3>
+            <p>Are you sure you want to delete this service request?</p>
+            <p className="modal-warning">This action cannot be undone.</p>
+            <div className="modal-actions">
+              <button className="btn-cancel-modal" onClick={cancelDelete}>
+                Cancel
+              </button>
+              <button className="btn-confirm-delete" onClick={confirmDelete}>
+                Delete Request
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
-      </main>
+      {/* Footer */}
+      <footer className="footer">
+        <div className="container">
+          <div className="footer-content">
+            <div className="footer-logo">GlobalTNA</div>
+            <p className="copyright">© 2024 GlobalTNA Service Solutions. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
