@@ -121,7 +121,7 @@ const JobDetails = () => {
     console.log('Deleting request:', jobData.id);
     setShowDeleteModal(false);
     // Redirect to jobs board
-    router.push('/jobs');
+    router.push('/jobForm');
   };
 
   const cancelDelete = () => {
@@ -227,7 +227,7 @@ const JobDetails = () => {
           <div className="logo">GlobalTNA</div>
           <div className="nav-links">
             <a href="/home">Home</a>
-            <a href="/jobs" className="active">Jobs</a>
+            <a href="/jobForm" className="active">Jobs</a>
             <a href="/my-requests">My Requests</a>
           </div>
           <div className="nav-buttons">

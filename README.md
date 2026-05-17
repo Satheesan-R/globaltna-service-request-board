@@ -1,166 +1,146 @@
-(The file `c:\Users\sathe\globaltna-service-request-board\README.md` exists, but is empty)
-# GlobalTNA — Service Request Board
+# GlobalTNA Service Request Board
 
-Lightweight service-request board for homeowners and vendors. This repository contains a Next.js frontend (`client/`) and an Express + MongoDB backend (`server/`).
+GlobalTNA is a full-stack service request platform where homeowners can post jobs and professionals can view and manage requests.
+
+This repository contains:
+- Frontend: Next.js app in client
+- Backend: Express + MongoDB API in server
 
 ## Features
-- Post service requests (title, description, category, location, contact)
-- View request cards on homepage with category icons
-- Request detail view with status management (Open / In Progress / Closed)
-- Simple authentication (register / login) and job persistence in MongoDB
+
+- User registration and login
+- Create service requests
+- View all service requests
+- View single request details
+- Update request status (Open, In Progress, Closed)
+- Delete requests
+- MongoDB Atlas data persistence
 
 ## Tech Stack
-- Frontend: Next.js (app router), React
-- Backend: Node.js, Express, Mongoose (MongoDB)
-- Auth: JSON Web Tokens (JWT)
 
-## Repo structure
+- Frontend: Next.js, React
+- Backend: Node.js, Express, Mongoose
+- Database: MongoDB Atlas
+- Auth: JWT
+- Deployment: Vercel (frontend), Render (backend)
 
-- `client/` — Next.js frontend (app/ directory)
-- `server/` — Express backend, routes, controllers, Mongoose models
-- `client/public/` — static images used by the frontend
+## Project Structure
 
-## Prerequisites
-- Node.js (v18+ recommended)
-- npm (or yarn)
-- MongoDB (local or Mongo Atlas)
+- client: Next.js frontend application
+- server: Express backend API and MongoDB models
+- vercel.json: Vercel build settings
 
-## Quick start
+## Local Development
 
-1. Clone repository
+### 1. Clone and install
 
-	git clone <repo-url>
-	cd globaltna-service-request-board
+    git clone <your-repo-url>
+    cd globaltna-service-request-board
 
-2. Start backend
+### 2. Backend setup (server)
 
-	cd server
-	npm install
+    cd server
+    npm install
 
-	Create a `.env` file in `server/` with the following variables:
+Create server/.env:
 
-	```env
-	MONGO_URI=<your-mongodb-connection-string>
-	PORT=5000
-	JWT_SECRET=<a-strong-secret>
-	```
+    MONGO_URI=your_mongodb_atlas_connection_string
+    JWT_SECRET=your_jwt_secret
+    PORT=5000
+    FRONTEND_URL=http://localhost:3000
 
-	Start the server:
+Run backend:
 
-	```bash
-	npm run dev
-	```
+    npm run dev
 
-	The server listens on `http://localhost:5000` by default.
+Backend runs at:
+- http://localhost:5000
 
-3. Start frontend
+### 3. Frontend setup (client)
 
-	Open a new terminal, then:
+Open a new terminal:
 
-	```bash
-	cd client
-	npm install
-	npm run dev
-	```
+    cd client
+    npm install
 
-	The Next.js app runs on `http://localhost:3000` by default.
+Create client/.env.local:
 
-If your frontend fetches the backend at a different base URL, update the fetch calls or set an environment variable and reference it in the client code.
+    NEXT_PUBLIC_API_URL=http://localhost:5000
 
-## API (quick reference)
+Run frontend:
 
-- GET `/api/jobs` — list jobs (supports `?category=` and `?status=` filters)
-- POST `/api/jobs` — create a job (JSON body)
-- GET `/api/jobs/:id` — get job by id
-- PATCH `/api/jobs/:id` — update job status (body: `{ status: "Open" | "In Progress" | "Closed" }`)
-- DELETE `/api/jobs/:id` — delete job
-- POST `/api/auth/register` — register user
-- POST `/api/auth/login` — login user (returns JWT)
+    npm run dev
 
-Example curl to change status:
+Frontend runs at:
+- http://localhost:3000
 
-bash
-curl -X PATCH http://localhost:5000/api/jobs/<jobId> \
-  -H 'Content-Type: application/json' \
-  -d '{"status":"In Progress"}'
+## API Endpoints
 
+Auth routes:
+- POST /api/auth/register
+- POST /api/auth/login
 
-## Data model (JobRequest)
+Job routes:
+- GET /api/jobs
+- POST /api/jobs
+- GET /api/jobs/:id
+- PATCH /api/jobs/:id
+- DELETE /api/jobs/:id
 
-- `title` (String, required)
-- `description` (String, required)
-- `category` (String)
-- `location` (String)
-- `Address` (String)
-- `phonenumber` (String)
-- `contactName` (String)
-- `contactEmail` (String, required, unique)
-- `status` (Enum: `Open`, `In Progress`, `Closed`) — default `Open`
-- `createdAt` (Date)
+## Deployment Guide
 
-Schema file: `server/models/JobRequest.js`.
+## Backend deployment (Render)
 
-## Notes & Troubleshooting
-- If `npm run dev` in `server/` exits immediately (exit code 1), check the `.env` `MONGO_URI` and ensure MongoDB is reachable. Look at server console for error details.
-- If frontend can't reach the backend, confirm the base URL and CORS settings in `server/server.js`.
+1. Create a Render Web Service from this repository.
+2. Set Root Directory to server.
+3. Build Command: npm install
+4. Start Command: npm start
+5. Add environment variables:
 
-## Development
-- Add or edit pages in `client/app/` (App Router). Remember to use `"use client"` at the top of files that use React hooks like `useState` or `useRouter`.
-- Backend controllers are in `server/controllers/` and routes in `server/routes/`.
+    MONGO_URI=your_mongodb_atlas_connection_string
+    JWT_SECRET=your_jwt_secret
+    FRONTEND_URL=https://your-production-vercel-domain.vercel.app
 
-## TODO / Improvements
-- Add proper auth-protected admin panel for managing requests
-- Add notifications/email on status changes
-- Add pagination and filters on the jobs listing
+Notes:
+- Backend CORS is configured to allow FRONTEND_URL, localhost, and Vercel deployment domains.
+- This fixes network errors caused by blocked browser requests from Vercel frontend.
 
-## Deployment
+## Frontend deployment (Vercel)
 
-This project is split into two separate deploys:
+1. Import the repository as a new Vercel project.
+2. Set Root Directory to client.
+3. Add environment variable:
 
-- Frontend: `client/` on Vercel
-- Backend: `server/` on Render
+    NEXT_PUBLIC_API_URL=https://your-render-backend.onrender.com
 
-### 1) Deploy the backend to Render
+4. Deploy.
 
-1. Create a new Web Service in Render and connect this repository.
-2. Set the Root Directory to `server`.
-3. Use these values:
-	- Build Command: `npm install`
-	- Start Command: `npm start`
-4. Add these environment variables in Render:
-	- `MONGO_URI` = your MongoDB connection string
-	- `JWT_SECRET` = a strong secret string
-	- `PORT` = `10000` or leave it unset and let Render assign one
-5. Deploy the service and copy the live backend URL, for example `https://your-service.onrender.com`.
+Important:
+- NEXT_PUBLIC_API_URL must point to your live backend URL.
+- Use https URLs in production.
 
-### 2) Deploy the frontend to Vercel
+## Troubleshooting
 
-1. Create a new project in Vercel and import the same repository.
-2. Set the Root Directory to `client`.
-3. Add this environment variable in Vercel:
-	- `NEXT_PUBLIC_API_URL` = your Render backend URL, for example `https://your-service.onrender.com`
-4. Deploy the project.
-5. After deployment, open the Vercel URL and verify that login, register, job creation, and request listing all talk to the Render backend.
+If frontend shows Network Error on Vercel:
+- Confirm NEXT_PUBLIC_API_URL is set in Vercel project settings.
+- Confirm FRONTEND_URL is set in Render backend settings.
+- Redeploy backend first, then frontend.
+- Check browser DevTools Network tab for blocked CORS/preflight requests.
 
-### Common issues
+If backend does not start:
+- Verify MONGO_URI and JWT_SECRET values.
+- Check Render logs for runtime errors.
 
-- If Vercel shows a 404, the Root Directory is usually wrong. It must be `client`.
-- If the frontend cannot reach the backend, check `NEXT_PUBLIC_API_URL`.
-- If Render fails to start, check `MONGO_URI`, `JWT_SECRET`, and the Render logs.
-- If browser requests are blocked, confirm CORS is enabled in `server/server.js`.
+If data is not saved:
+- Confirm backend URL is reachable directly in browser or Postman.
+- Verify MongoDB Atlas network access and user permissions.
 
-### Live URLs
+## Recent Fixes Included
 
-After both deploys finish, add your live URLs here:
-
-- Frontend: `https://your-vercel-app.vercel.app`
-- Backend: `https://your-render-service.onrender.com`
-
-## Contributing
-- Fork the repo, create a branch, open a PR. Keep changes focused and add tests where appropriate.
+- Improved backend CORS for Vercel deployments and preview URLs.
+- Removed duplicate auth route registration in backend server setup.
+- Normalized frontend API base URL to prevent malformed request URLs.
 
 ## License
-- (Add your preferred license here)
 
----
-If you'd like, I can add a short `docker-compose.yml` to run Mongo + server + client for faster local setup. Would you like that? 
+Add your preferred license here.
