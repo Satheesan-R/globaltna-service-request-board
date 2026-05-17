@@ -23,7 +23,7 @@ const App = () => {
       category: 'Plumbing',
       title: 'Emergency Pipe Repair',
       description: 'Urgent leak in master bathroom requires immediate attention. Sink pipe has burst and needs immediate repair to prevent water damage.',
-      location: 'Glasgow West End',
+      location: 'Colombo',
       status: 'Open',
       contactName: 'Sarah Johnson',
     },
@@ -32,7 +32,7 @@ const App = () => {
       category: 'Painting',
       title: 'Full Living Room Refresh',
       description: 'High ceiling living room requires painting and light sanding. Neutral palette preferred. Materials provided by homeowner.',
-      location: 'Edinburgh City Centre',
+      location: 'Colombo',
       status: 'Open',
       contactName: 'Michael Smith',
     },
@@ -41,7 +41,7 @@ const App = () => {
       category: 'Electrical',
       title: 'EV Charger Installation',
       description: 'Certified electrician needed to install a new home charging station in a detached garage with new circuit.',
-      location: 'Stirling',
+      location: 'Colombo',
       status: 'In Progress',
       contactName: 'Emma Davis',
     },
@@ -50,7 +50,7 @@ const App = () => {
       category: 'Joinery',
       title: 'Bespoke Fitted Wardrobe',
       description: 'Custom oak wardrobe for a master bedroom. Design is ready, seeking a craftsman for execution and installation.',
-      location: 'Bearden',
+      location: 'Colombo',
       status: 'Open',
       contactName: 'James Wilson',
     },
@@ -138,7 +138,7 @@ const App = () => {
       <section className="hero">
         <div className="hero-container">
           <h1>Find Skilled Pros for <span className="highlight">Your Next Project</span></h1>
-          <p>Connecting homeowners in Glasgow and beyond with verified specialists in plumbing, electrical, painting, and joinery.</p>
+          <p>Connecting homeowners in Colombo and beyond with verified specialists in plumbing, electrical, painting, and joinery.</p>
           <div className="hero-buttons">
             <button className="btn-large btn-primary" onClick={() => router.push("/jobForm")}>
               Post Your Job
