@@ -14,7 +14,10 @@ connectDB();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: ["https://globaltna-service-request-board-gold.vercel.app", "http://localhost:3000"],
+  credentials: true
+}));
 app.use(express.json());
 
 // Routes
